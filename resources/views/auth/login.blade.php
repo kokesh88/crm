@@ -1,35 +1,39 @@
 <x-guest-layout>
-  <div class="d-flex align-items-center justify-content-center h-100">
-    <div class="w-50 border rounded p-5 bg-light">
-      <form method="POST" action="{{ route('login') }}">
-        @csrf
+    <div class="flex items-center justify-center min-h-screen bg-gray-900">
+        <div class="w-full max-w-md bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold text-center text-white mb-6">Вход в систему</h2>
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
 
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input 
-          name="email"
-          type="email" 
-          class="form-control @error('email') is-invalid @enderror" 
-          id="email" 
-          aria-describedby="emailHelp" 
-          required> 
-          @error('email')
-            <div class="invalid-feedback">{{ $message }}</div>   
-          @enderror      
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-white">Email</label>
+                    <input
+                        name="email"
+                        type="email"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('email') is-invalid @enderror"
+                        id="email"
+                        aria-describedby="emailHelp"
+                        required>
+                    @error('email')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-white">Пароль</label>
+                    <input name="password" type="password" class="mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="password" required>
+                </div>
+
+                <div class="mb-4 flex items-center">
+                    <input name="remember" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded" id="remember_me">
+                    <label class="ml-2 block text-sm text-white" for="remember_me">Запомнить меня</label>
+                </div>
+
+                <div class="flex flex-col space-y-4">
+                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Войти</button>
+                    <a href="{{ route('register') }}" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-center">Регистрация</a>
+                </div>
+            </form>
         </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Пароль</label>
-          <input name="password" type="password" class="form-control" id="password" required>
-        </div>    
-
-        <div class="mb-3 form-check">
-          <input name="remember" type="checkbox" class="form-check-input" id="remember_me">
-          <label class="form-check-label" for="remember_me">Запомнить меня</label>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Войти</button>
-      </form>
-    </div>  
-  </div>  
+    </div>
 </x-guest-layout>

@@ -2,45 +2,37 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $admin = Role::create(['name' => 'admin']);
-        $manager = Role::create(['name' => 'manager']);
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // Create roles if they don't exist
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $client = Role::firstOrCreate(['name' => 'client']);
+        $master = Role::firstOrCreate(['name' => 'master']);
+
+        // Create permissions if they don't exist
         $permissions = [
-            'add funnel'           => [  $admin             ],
-            'edit funnel'          => [  $admin             ],
-            'delete funnel'        => [  $admin             ],
-            'add client'           => [  $admin,  $manager  ],
-            'add employee'         => [  $admin             ],
-            'edit employee'        => [  $admin             ],
-            'delete employee'      => [  $admin             ],
-            'add role'             => [  $admin             ],
-            'edit role'            => [  $admin             ],
-            'delete role'          => [  $admin             ],
-            'add task'             => [  $admin,  $manager  ],
-            'assign to task'       => [  $admin             ],
-            'add deal'             => [  $admin,  $manager  ],
-            'edit any deal'        => [  $admin             ],
+            'create application',
+            'view own applications',
+            'view all applications',
+            'update application status',
         ];
 
-        foreach ($permissions as $permissionKey => $roles) {
-            $permission = Permission::create(['name' => $permissionKey]);               
-            foreach ($roles as $role) {                 
-                $role->givePermissionTo($permission);
-            }
-        }                                               
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Assign permissions to roles
+        $client->givePermissionTo(['create application', 'view own applications']);
+        $master->givePermissionTo(['view all applications', 'update application status']);
+        $admin->givePermissionTo(Permission::all());
     }
 }

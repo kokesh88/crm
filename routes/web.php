@@ -1,83 +1,58 @@
 <?php
 
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\DealController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\TaskController;
-use App\Http\Livewire\Analytics\Index as AnalyticsIndex;
-use App\Http\Livewire\Clients\CustomFields as ClientsCustomFields;
-use App\Http\Livewire\Contacts\Index as ContactsIndex;
-use App\Http\Livewire\Deals\CustomFields as DealsCustomFields;
-use App\Http\Livewire\Deals\Index as DealsIndex;
-use App\Http\Livewire\Deals\Show as DealsShow;
-use App\Http\Livewire\Employees\Edit as EmployeesEdit;
-use App\Http\Livewire\IncomingLeads\Index as IncomingLeadsIndex;
-use App\Http\Livewire\Settings\CreateFunnel;
-use App\Http\Livewire\Settings\CreateRole;
-use App\Http\Livewire\Settings\EditFunnel;
-use App\Http\Livewire\Settings\EditRole;
-use App\Http\Livewire\Settings\Index as SettingsIndex;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\MasterApplicationController;
+use App\Http\Controllers\ClientApplicationController;
 
 require __DIR__ . '/auth.php';
 
-Route::redirect('/', RouteServiceProvider::HOME);
+Route::redirect('/', '/dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::resource('tasks', TaskController::class)->except(['show']);
-
-    Route::resource('deals', DealController::class)->only(['create', 'store', 'destroy']);
-    Route::get('deals', DealsIndex::class)->name('deals.index');
-    Route::get('deals/{deal}', DealsShow::class)->name('deals.show');
-    Route::get('deals/{deal}/custom_fields', DealsCustomFields::class)
-        ->middleware('can:update,deal')
-        ->name('deals.custom_fields');
-
-    Route::get('contacts', ContactsIndex::class)->name('contacts');
-
     Route::resource('clients', ClientController::class)->except(['index']);
-    Route::get('clients/{client}/custom_fields', ClientsCustomFields::class)
-        ->middleware('can:update,client')
-        ->name('clients.custom_fields');
-
     Route::resource('employees', EmployeeController::class)->except(['index', 'edit', 'update']);
-    Route::get('employees/{employee}/edit', EmployeesEdit::class)
-        ->middleware('can:edit employee')
-        ->name('employees.edit');
 
-    Route::get('analytics', AnalyticsIndex::class)->name('analytics.index');
+    Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
+    Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
-    Route::prefix('settings')->group(function () {
-        Route::get('/', SettingsIndex::class)->name('settings');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/prices', [HomeController::class, 'prices'])->name('prices');
+    Route::get('/work', [HomeController::class, 'work'])->name('work');
+    Route::get('/partners', [HomeController::class, 'partners'])->name('partners');
+    Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
-        Route::get('funnels/create', CreateFunnel::class)
-            ->middleware('can:add funnel')
-            ->name('funnels.create');
+    // Маршруты для заявок
+    Route::resource('applications', ApplicationController::class)->except(['show', 'edit', 'destroy']);
+    Route::patch('applications/{application}/update-status', [ApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
 
-        Route::get('funnels/{funnel}/edit', EditFunnel::class)
-            ->middleware('can:edit funnel')
-            ->name('funnels.edit');
-
-        Route::get('roles/create', CreateRole::class)
-            ->middleware('can:add role')
-            ->name('roles.create');
-
-        Route::get('roles/{role}/edit', EditRole::class)
-            ->middleware('can:edit role')
-            ->name('roles.edit');
+    Route::middleware('role:master')->group(function () {
+        Route::get('/master/applications', [MasterApplicationController::class, 'index'])->name('master.applications.index');
+        Route::delete('/master/applications/{application}', [MasterApplicationController::class, 'destroy'])->name('master.applications.destroy');
+        Route::patch('/master/applications/{application}/update-status', [MasterApplicationController::class, 'updateStatus'])->name('master.applications.updateStatus');
     });
 
-    Route::get('incoming_leads', IncomingLeadsIndex::class)->name('incoming_leads.index');
+    Route::middleware('role:client')->group(function () {
+        Route::get('/client/applications', [ClientApplicationController::class, 'index'])->name('client.applications.index');
+    });
 });
+
+Route::get('/applications/create', [ApplicationController::class, 'create'])->name('applications.create');
+Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

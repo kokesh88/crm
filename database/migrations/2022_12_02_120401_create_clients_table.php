@@ -10,10 +10,11 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->string('full_name');
-            $table->string('email')->nullable();
-            $table->char('phone_number', 17)->nullable();
-            $table->dateTime('created_at');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone');
+            $table->string('address');
+            $table->timestamps();
         });
     }
 

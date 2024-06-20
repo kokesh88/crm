@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             DealsCustomFieldsSeeder::class,
             TasksSeeder::class,
             TelegramChatSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

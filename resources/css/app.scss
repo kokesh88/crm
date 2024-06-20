@@ -1,2 +1,22 @@
-@import "node_modules/bootstrap/scss/bootstrap";
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css");
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #1a202c;
+    color: white;
+}
+
+.table-header {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.table-row {
+    border-bottom: 1px solid #4a5568;
+}
+
+.table-row:nth-child(odd) {
+    background-color: #2d3748;
+}
